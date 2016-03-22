@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/aommm/PYYEhljVwUqatyvSSFrm8Q#readme",
   "dependencies": {
+    "bluebird": "^3.3.4",
+    "co": "^4.6.0",
     "nodestalker": "^0.1.21"
   }
 }
