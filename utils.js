@@ -28,6 +28,17 @@ function newBeanstalkClient() {
   return client;
 }
 
+/**
+ * Checks if HTTP status code is 4xx or 5xx
+ * @param {String|Number} code
+ * @returns {boolean} - true if status code is bad, false if good
+ */
+function badStatusCode(code) {
+  code = code+"";
+  return ['4','5'].indexOf(code[0]) !== -1;
+}
+
 module.exports = {
-  newBeanstalkClient: newBeanstalkClient
+  newBeanstalkClient: newBeanstalkClient,
+  badStatusCode: badStatusCode
 };

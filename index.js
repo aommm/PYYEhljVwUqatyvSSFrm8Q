@@ -1,9 +1,11 @@
 const co = require('co');
-const Promise = require("bluebird");
+const Promise = require('bluebird');
+var   request = require('request');
 
 const config = require('./config');
 const utils = require('./utils');
 
+request = Promise.promisify(request, {multiArgs: true});
 var db = require('monk')(config.mongoAddress);
 var exchangeRates = db.get('exchangeRates');
 
@@ -67,15 +69,14 @@ function getJob() {
  */
 function addToMongo(job, exchangeRate) {
   return co(function*() {
-    console.log("addToMongo", arguments);
     const doc = {
       from: job.data.from,
       to: job.data.to,
       created_at: new Date(),
       rate: exchangeRate
-    }
+    };
     const res = yield exchangeRates.insert(doc);
-    console.log('res:', res);
+    console.log(job.id,'added to mongo:', res);
   });
 }
 
@@ -88,7 +89,6 @@ function addToMongo(job, exchangeRate) {
  */
 function maybeRescheduleJob(client, job, success) {
   return co(function*() {
-    console.log("maybeRescheduleJob", arguments);
     if (success) {
       job.data.succeeded++;
     } else {
@@ -115,17 +115,25 @@ function maybeRescheduleJob(client, job, success) {
   });
 }
 
-function getExchangeRate(client, job) {
-  return new Promise(function(resolve, reject) {
-    // doing something really expensive
-    setTimeout(function() {
-      //resolve(true);
-      const val = Math.random();
-      if (val<0.5)
-        resolve(val+"");
-      else
-        reject("asdf!");
-    }, 1000);
+/**
+ * Gets exchange rate from fixer.io
+ *
+ * @param {String} job.data.from - e.g. 'HKD'
+ * @param {String} job.data.to - e.g. 'USD'
+ * @returns {Promise} - @returns {String} rounded to two decimal places, i.e. "0.13"
+ */
+function getExchangeRate(job) {
+  return co(function*() {
+    // Get exchange rate from fixer.io
+    const url = "https://api.fixer.io/latest?base="+job.data.from+"&symbols="+job.data.to;
+    const result = yield request({method: 'GET', url: url, json: true});
+    const response = result[0];
+    const body = result[1];
+    if (utils.badStatusCode(response.statusCode))
+      throw new Error("Bad API request:"+response.statusCode+body);
+    // Extract exchange rate from response body
+    const exchangeRate = body.rates[job.data.to].toFixed(2);
+    return exchangeRate;
   });
 }
 

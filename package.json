@@ -21,6 +21,7 @@
     "co": "^4.6.0",
     "mongodb": "^2.0.55",
     "monk": "^1.0.1",
-    "nodestalker": "^0.1.21"
+    "nodestalker": "^0.1.21",
+    "request": "^2.69.0"
   }
 }
