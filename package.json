@@ -20,7 +20,7 @@
     "bluebird": "^3.3.4",
     "co": "^4.6.0",
     "mongodb": "^2.0.55",
-    "mongoskin": "^2.0.3",
+    "monk": "^1.0.1",
     "nodestalker": "^0.1.21"
   }
 }

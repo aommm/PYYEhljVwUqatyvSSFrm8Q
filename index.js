@@ -1,11 +1,11 @@
-var co = require('co');
-var Promise = require("bluebird");
-var mongo = require("mongoskin");
+const co = require('co');
+const Promise = require("bluebird");
 
-var config = require('./config');
-var utils = require('./utils');
+const config = require('./config');
+const utils = require('./utils');
 
-Promise.promisifyAll(mongo);
+var db = require('monk')(config.mongoAddress);
+var exchangeRates = db.get('exchangeRates');
 
 function onError(err) {
   console.log('Unrecoverable error:', err);
@@ -30,7 +30,7 @@ function main() {
       var exchangeRate = yield getExchangeRate(job);
     } catch (err) {}
     if (exchangeRate)
-      yield updateMongoDb(job, exchangeRate);
+      yield addToMongo(job, exchangeRate);
     yield maybeRescheduleJob(client, job, exchangeRate);
     console.log(job.id,'job done');
     client.disconnect();
@@ -62,12 +62,20 @@ function getJob() {
 /**
  * Takes a job and its result, and puts the result into mongodb
  * @param {Object} job
- * @param {Object} success
+ * @param {String} exchangeRate
  * @returns {Promise}
  */
-function updateMongoDb(job, exchangeRate) {
+function addToMongo(job, exchangeRate) {
   return co(function*() {
-    console.log("updateMongoDb", arguments);
+    console.log("addToMongo", arguments);
+    const doc = {
+      from: job.data.from,
+      to: job.data.to,
+      created_at: new Date(),
+      rate: exchangeRate
+    }
+    const res = yield exchangeRates.insert(doc);
+    console.log('res:', res);
   });
 }
 
@@ -99,7 +107,7 @@ function maybeRescheduleJob(client, job, success) {
     else { // Else, put job back into queue
       console.log(job.id,'put back into queue');
       var delay = success ? 60 : 3;
-      // Delete job, then put back into queue with new body
+      // Cannot modify job payloads (afaik); therefore, delete job and put back into queue with new payload
       yield client.deleteJobAsync(job.id);
       var data = JSON.stringify(job.data);
       yield client.putAsync(data, undefined, delay);
@@ -112,7 +120,11 @@ function getExchangeRate(client, job) {
     // doing something really expensive
     setTimeout(function() {
       //resolve(true);
-      reject("asdf!");
+      const val = Math.random();
+      if (val<0.5)
+        resolve(val+"");
+      else
+        reject("asdf!");
     }, 1000);
   });
 }
