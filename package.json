@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node_modules/mocha/bin/mocha tests/"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,10 @@
     "request": "^2.69.0"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
     "eslint": "^1.10.3",
-    "eslint-config-aftership": "^1.11.1"
+    "eslint-config-aftership": "^1.11.1",
+    "mocha": "^2.4.5"
   }
 }

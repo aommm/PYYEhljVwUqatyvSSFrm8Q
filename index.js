@@ -125,6 +125,8 @@ function maybeRescheduleJob(client, job, success) {
 /**
  * Gets exchange rate from fixer.io
  *
+ * @param {Object} job
+ * @param {Object} job.data
  * @param {String} job.data.from - e.g. 'HKD'
  * @param {String} job.data.to - e.g. 'USD'
  * @returns {Promise} - @returns {String} rounded to two decimal places, i.e. "0.13"
@@ -146,3 +148,7 @@ function getExchangeRate(job) {
 }
 
 runMain();
+
+module.exports = {
+	getExchangeRate: getExchangeRate
+};
