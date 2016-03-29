@@ -23,5 +23,9 @@
     "monk": "^1.0.1",
     "nodestalker": "^0.1.21",
     "request": "^2.69.0"
+  },
+  "devDependencies": {
+    "eslint": "^1.10.3",
+    "eslint-config-aftership": "^1.11.1"
   }
 }
