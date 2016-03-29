@@ -1,3 +1,7 @@
 {
-  "extends": "aftership"
+  "extends": "aftership",
+  "rules": {
+    "no-shadow": 0,
+    "brace-style": 0
+  }
 }

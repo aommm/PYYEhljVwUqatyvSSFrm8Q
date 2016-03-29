@@ -1,18 +1,19 @@
-var config = require('./config');
-var bs = require('nodestalker');
-var Promise = require("bluebird");
+'use strict';
+const config = require('./config');
+const bs = require('nodestalker');
+const Promise = require('bluebird');
 
 /**
  * Promisifies a NodeStalker method
  */
 function nodeStalkerPromisifier(method) {
-  return function promisified() {
-    var args = [].slice.call(arguments);
-    var self = this;
-    return new Promise( function(resolve, reject) {
-      method.apply(self, args).onSuccess(resolve).onError(reject);
-    });
-  }
+	return function promisified() {
+		const args = [].slice.call(arguments);
+		const self = this;
+		return new Promise(function (resolve, reject) {
+			method.apply(self, args).onSuccess(resolve).onError(reject);
+		});
+	};
 }
 
 /**
@@ -22,10 +23,10 @@ function nodeStalkerPromisifier(method) {
  * @returns {BeanstalkClient}
  */
 function newBeanstalkClient() {
-  var client = bs.Client(config.bsConfig);
-  // (Must promisify each instance here afaik, since we don't have access to class)
-  client = Promise.promisifyAll(client, {promisifier: nodeStalkerPromisifier});
-  return client;
+	let client = bs.Client(config.bsConfig);
+	// (Must promisify each instance here afaik, since we don't have access to class)
+	client = Promise.promisifyAll(client, {promisifier: nodeStalkerPromisifier});
+	return client;
 }
 
 /**
@@ -34,11 +35,11 @@ function newBeanstalkClient() {
  * @returns {boolean} - true if status code is bad, false if good
  */
 function badStatusCode(code) {
-  code = code+"";
-  return ['4','5'].indexOf(code[0]) !== -1;
+	code = String(code);
+	return ['4', '5'].indexOf(code[0]) !== -1;
 }
 
 module.exports = {
-  newBeanstalkClient: newBeanstalkClient,
-  badStatusCode: badStatusCode
+	newBeanstalkClient: newBeanstalkClient,
+	badStatusCode: badStatusCode
 };
