@@ -2,10 +2,10 @@
 const bs = require('nodestalker');
 const config = require('../config');
 
-const client = bs.Client(config.bsConfig);
+const client = bs.Client(config.bs_config);
 console.log('putting something...');
 
-client.use(config.bsTube).onSuccess(function () {
+client.use(config.bs_tube).onSuccess(function () {
 	console.log('use done', arguments);
 	const obj = {from: 'HKD', to: 'USD'};
 	client.put(JSON.stringify(obj), undefined, 0)

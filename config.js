@@ -1,9 +1,9 @@
 'use strict';
 module.exports = {
-	bsConfig: {
+	bs_config: {
 		address: 'challenge.aft' + 'ership.net', // obfuscate company name
 		port: 11300
 	},
-	bsTube: 'aommm',
-	mongoAddress: 'localhost/PYYEhljVwUqatyvSSFrm8Q'
+	bs_tube: 'aommm',
+	mongo_address: 'localhost/PYYEhljVwUqatyvSSFrm8Q'
 };

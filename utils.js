@@ -23,7 +23,7 @@ function nodeStalkerPromisifier(method) {
  * @returns {BeanstalkClient}
  */
 function newBeanstalkClient() {
-	let client = bs.Client(config.bsConfig);
+	let client = bs.Client(config.bs_config);
 	// (Must promisify each instance here afaik, since we don't have access to class)
 	client = Promise.promisifyAll(client, {promisifier: nodeStalkerPromisifier});
 	return client;

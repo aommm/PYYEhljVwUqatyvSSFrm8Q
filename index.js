@@ -7,7 +7,7 @@ const config = require('./config');
 const utils = require('./utils');
 
 request = Promise.promisify(request, {multiArgs: true});
-const db = require('monk')(config.mongoAddress);
+const db = require('monk')(config.mongo_address);
 const exchangeRates = db.get('exchangeRates');
 
 function onError(err) {
@@ -52,7 +52,7 @@ function getJob() {
 	return co(function*() {
 		// Open new socket and connect to a tube
 		const client = utils.newBeanstalkClient();
-		yield client.watchAsync(config.bsTube);
+		yield client.watchAsync(config.bs_tube);
 		// Get job
 		console.log('waiting for job...');
 		const job = yield client.reserveAsync();
@@ -140,8 +140,8 @@ function getExchangeRate(job) {
 			throw new Error('Bad API request:' + response.statusCode + body);
 		}
 		// Extract exchange rate from response body
-		const exchangeRate = body.rates[job.data.to].toFixed(2);
-		return exchangeRate;
+		const exchange_rate = body.rates[job.data.to].toFixed(2);
+		return exchange_rate;
 	});
 }
 
