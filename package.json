@@ -19,10 +19,12 @@
   "dependencies": {
     "bluebird": "^3.3.4",
     "co": "^4.6.0",
+    "lodash": "^4.6.1",
     "mongodb": "^2.0.55",
     "monk": "^1.0.1",
     "nodestalker": "^0.1.21",
-    "request": "^2.69.0"
+    "request": "^2.69.0",
+    "uuid": "^2.0.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",

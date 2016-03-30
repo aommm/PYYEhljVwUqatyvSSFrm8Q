@@ -7,31 +7,46 @@ const config = require('./config');
 const utils = require('./utils');
 
 request = Promise.promisify(request, {multiArgs: true});
-const db = require('monk')(config.mongo_address);
-const exchangeRates = db.get('exchangeRates');
+let exchangeRates;
 
-function onError(err) {
-	console.log('Unrecoverable error:', err);
-}
 
 /**
  * Launches a new worker.
  * Worker gets a job from queue, processes it, reschedules/buries it, and starts over
  */
 function launchWorker() {
-	_launchWorker().catch(onError);
+	_initDb();
+	_launchWorker();
+}
+
+/**
+ * Open the connection to the database
+ * @private
+ */
+function _initDb() {
+	console.log('initing db:', config.mongo_address);
+	const db = require('monk')(config.mongo_address);
+	exchangeRates = db.get('exchangeRates');
+}
+
+// Wrapper around __launchWorker which handles errors
+function _launchWorker() {
+	function onError(err) {
+		console.log('Unrecoverable error:', err);
+	}
+	__launchWorker().catch(onError);
 }
 
 /**
  * @returns {Promise}
  * @private
  */
-function _launchWorker() {
+function __launchWorker() {
 	return co(function*() {
 		const result = yield _getJob();
 		const client = result.client;
 		const job = result.job;
-		launchWorker(); // immediately start listening for new job
+		_launchWorker(); // immediately start listening for new job
 		console.log(job.id, 'got job! processing...', job);
 		let exchange_rate;
 		try {
@@ -157,6 +172,7 @@ function _getExchangeRate(job) {
 
 module.exports = {
 	launchWorker: launchWorker,
+	_initDb: _initDb,
 	_getExchangeRate: _getExchangeRate,
 	_getJob: _getJob
 };

@@ -1,3 +1,3 @@
-const lib = require('./lib');
+const worker = require('./worker');
 
-lib.launchWorker();
+worker.launchWorker();
