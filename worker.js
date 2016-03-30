@@ -172,6 +172,7 @@ function _getExchangeRate(job) {
 
 module.exports = {
 	launchWorker: launchWorker,
+	__launchWorker : __launchWorker,
 	_initDb: _initDb,
 	_maybeRescheduleJob : _maybeRescheduleJob,
 	_getExchangeRate: _getExchangeRate,

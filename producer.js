@@ -20,4 +20,4 @@ function addToQueue(from, to) {
 
 module.exports = {
 	addToQueue: addToQueue
-}
+};

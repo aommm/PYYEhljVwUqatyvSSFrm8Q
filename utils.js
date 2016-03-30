@@ -39,7 +39,17 @@ function badStatusCode(code) {
 	return ['4', '5'].indexOf(code[0]) !== -1;
 }
 
+//setTimeout that returns a promise
+function delay(ms) {
+	var deferred = Promise.pending();
+	setTimeout(function(){
+		deferred.resolve();
+	}, ms);
+	return deferred.promise;
+}
+
 module.exports = {
 	newBeanstalkClient: newBeanstalkClient,
-	badStatusCode: badStatusCode
+	badStatusCode: badStatusCode,
+	delay: delay
 };
