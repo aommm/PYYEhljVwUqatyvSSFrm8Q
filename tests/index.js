@@ -28,6 +28,27 @@ function enableConsoleLog() {
 	old_console_log = null;
 }
 
+let old_config;
+function mockConfig() {
+	disableConsoleLog();
+	// Temporarily change config
+	old_config = _.cloneDeep(config);
+	config.bs_tube = 'aommm-test';
+	config.fail_delay = 0;
+	config.success_delay = 0;
+	config.mongo_address = 'localhost/' + uuid.v4(); // Use random db
+	return worker._initDb(); // Tell worker to use the random db
+}
+function restoreConfig() {
+	// Delete mongodb
+	const db = monk(config.mongo_address);
+	const exchangeRates = db.get('exchangeRates');
+	const dropPromise = Promise.resolve(exchangeRates.drop()).catch(_.noop); // If drop failed, don't tell mocha
+	// Restore config
+	_.assign(config, old_config);
+	return dropPromise;
+}
+
 // ----------------------------------------------------------------------------
 // Tests
 
@@ -44,38 +65,16 @@ describe('Exchange rates', function () {
 
 describe('Beanstalk queue', function () {
 	this.timeout(5000);
-
-	let old_config;
+	before(mockConfig);
+	after(restoreConfig);
 	before(function () {
-		disableConsoleLog();
-		// Temporarily change config
-		old_config = _.cloneDeep(config);
-		config.bs_tube = 'aommm-test';
-		config.fail_delay = 0;
-		config.success_delay = 0;
-		config.mongo_address = 'localhost/' + uuid.v4(); // Use random db
-
-		return Promise.all([
-			worker._initDb(), // Tell worker to use the random db
-			producer.addToQueue('HKD', 'USD') // Put a job into pipeline
-		]);
+		return producer.addToQueue('HKD', 'USD'); // Put a job into pipeline
 	});
-
-	after(function () {
-		// Delete mongodb
-		const db = monk(config.mongo_address);
-		const exchangeRates = db.get('exchangeRates');
-		const dropPromise = Promise.resolve(exchangeRates.drop()).catch(_.noop); // If drop failed, don't tell mocha
-		// Restore config
-		_.assign(config, old_config);
-		return dropPromise;
-	});
-
 	// Disable console.log before each test
 	// (Enabling needs to take place manually in each test in order for mocha output to get logged; see tests below)
 	beforeEach(disableConsoleLog);
 
-	it('gets a job from queue', function () {
+	it('Gets a job', function () {
 		return worker._getJob().then(enableConsoleLog);
 	});
 
