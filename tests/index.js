@@ -49,8 +49,7 @@ function mockConfig() {
 function restoreConfig() {
 	// Delete mongodb
 	const db = monk(config.mongo_address);
-	const exchangeRates = db.get('exchangeRates');
-	const dropPromise = Promise.resolve(exchangeRates.drop()).catch(_.noop); // If drop failed, don't tell mocha
+	const dropPromise = db.driver.dropDatabase();
 	// Restore config
 	_.assign(config, old_config);
 	return dropPromise;
