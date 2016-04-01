@@ -43,13 +43,16 @@ function mockConfig() {
 	config.bs_tube = 'aommm-test';
 	config.fail_delay = 0;
 	config.success_delay = 0;
-	config.mongo_address = 'localhost/' + uuid.v4(); // Use random db
+	//config.mongo_address = 'localhost/' + uuid.v4(); // Use random db
+	config.mongo_address = config.mongo_address_test;
 	return worker._initDb(); // Tell worker to use the random db
 }
 function restoreConfig() {
 	// Delete mongodb
 	const db = monk(config.mongo_address);
-	const dropPromise = db.driver.dropDatabase();
+	const exchangeRates = db.get('exchangeRates');
+	const dropPromise = Promise.resolve(exchangeRates.drop()).catch(_.noop); // If drop failed, don't tell mocha
+	//const dropPromise = db.driver.dropDatabase();
 	// Restore config
 	_.assign(config, old_config);
 	return dropPromise;

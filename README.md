@@ -15,14 +15,12 @@ A job is considered finished if it succeeds 10 times. If a job fails 3 times in 
   1. Results are on the following format: `{from: 'HKD', to: 'USD', timestamp: new Date(...), rate: '0.13'}`
 
 ### Howto run tests
-1. Make sure you have mongodb running locally (the tests creates temporary databases)
+1. Update `config.js` with connection strings for mongodb test database and beanstalk queue
 2. `npm test`
 
 
 ### Known issues
 * Tests:
-  * Database created by "Launching workers" test is not deleted when test exits
-    * _Workaround_: After running tests, delete database manually from mongo shell
   * Sometimes, test queue can hold old test jobs, which can cause tests to fail.
     * _Workaround_: Run `node scripts/clear.js aommm-test` to clear queue
     * _Planned fix_: Tell Mocha to empty test queue before running tests
